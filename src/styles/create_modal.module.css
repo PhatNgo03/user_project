@@ -1,0 +1,24 @@
+/* Đảm bảo các trường input và textarea ngắt dòng khi text quá dài */
+.form-control {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.form-control {
+    max-width: 100%;
+}
+
+.inputField {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.textAreaField {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+.modal-lg {
+    max-width: 80%;
+}

@@ -1,10 +1,9 @@
 
 interface IUser {
     id: number,
+    name: string,
     email: string,
-    username: string,
-    age: string,
-    gender: string,
-    address: string,
+    password: string,
+    role: string,
 }
 
