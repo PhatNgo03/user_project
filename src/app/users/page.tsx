@@ -1,8 +1,8 @@
-'use client'
+// src/app/users/page.tsx
+'use client';
 import AppTable from '@/components/app.table';
-
-import useSWR from 'swr'
-
+import useSWR from 'swr';
+import withAuth from '../hoc/withAuth';
 
 const UsersPage = () => {
     const fetcher = (url: string) => fetch(url).then(res => res.json());
@@ -14,7 +14,7 @@ const UsersPage = () => {
     });
 
     if (isLoading) {
-        return <div>loading...</div>;
+        return <div>Loading...</div>;
     }
 
     if (error) {
@@ -28,4 +28,5 @@ const UsersPage = () => {
     );
 };
 
-export default UsersPage;
+// Bảo vệ trang chỉ cho phép người dùng có vai trò 'admin' truy cập
+export default withAuth(UsersPage, ['ADMIN']);

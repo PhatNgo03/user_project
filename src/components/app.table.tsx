@@ -17,7 +17,7 @@ const AppTable = (props: IProps) => {
 
     const { users } = props;
     const [showModalCreate, setShowModalCreate] = useState<boolean>(false);
-    const [selectedUser, setselectedUser] = useState<IUser | null>(null); // Blog được chọn để view hoặc edit
+    const [selectedUser, setselectedUser] = useState<IUser | null>(null);
 
     const handleEditUser = (user: IUser) => {
         setselectedUser(user);
@@ -101,7 +101,7 @@ const AppTable = (props: IProps) => {
                 <CreateModal
                     showModalCreate={showModalCreate}
                     setShowModalCreate={setShowModalCreate}
-                    selectedUser={selectedUser} // Truyền user được chọn vào modal
+                    selectedUser={selectedUser}
                 />
             </div>
         </>
