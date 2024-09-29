@@ -13,6 +13,9 @@ Function :
  - Check Role: User and admin
 
 BackEnd : use data fake 
-
+NOTE 
+    Use this account to log in as an Administrator:
+    Email : admin@gmail.com
+    Password : Aa123456
 github BE : https://github.com/PhatNgo03/be-user-project
 ```
