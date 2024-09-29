@@ -8,6 +8,8 @@ const LogoutPage = () => {
 
     useEffect(() => {
         localStorage.removeItem('user');
+
+        window.dispatchEvent(new Event('userLoggedOut'));
         router.push('/auth/login');
     }, [router]);
 

@@ -1,21 +1,44 @@
-// src/components/app.header.tsx
-'use client'
-import { useEffect, useState } from 'react';
+'use client';
+
+import { useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Link from 'next/link';
 import styles from '@/styles/app_header.module.css';
+import { useUser } from '@/context/UserContext';
 
 const AppHeader = () => {
-    const [user, setUser] = useState(null);
+    const { user, setUser } = useUser();
 
-    useEffect(() => {
+    const updateUserFromLocal = () => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             setUser(JSON.parse(storedUser));
+        } else {
+            setUser(null);
         }
-    }, []);
+    };
+
+    useEffect(() => {
+        updateUserFromLocal();
+
+        const handleUserLoggedIn = () => {
+            updateUserFromLocal();
+        };
+
+        const handleUserLoggedOut = () => {
+            updateUserFromLocal();
+        };
+
+        window.addEventListener('userLoggedIn', handleUserLoggedIn);
+        window.addEventListener('userLoggedOut', handleUserLoggedOut);
+
+        return () => {
+            window.removeEventListener('userLoggedIn', handleUserLoggedIn);
+            window.removeEventListener('userLoggedOut', handleUserLoggedOut);
+        };
+    }, [setUser]);
 
     return (
         <Navbar sticky="top" expand="lg" className="bg-body-tertiary">

@@ -7,14 +7,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from '@/styles/login.module.css';
 import { useRouter } from 'next/navigation';
-import bcrypt from 'bcryptjs';
+import { useUser } from '@/context/UserContext';
+// import bcrypt from 'bcryptjs';
 
 const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const router = useRouter();
-
+    const { setUser } = useUser();
     const validateEmail = (email: string) => {
         const re = /\S+@\S+\.\S+/;
         return re.test(email);
@@ -24,87 +25,42 @@ const LoginForm = () => {
         e.preventDefault();
 
         if (!validateEmail(email)) {
-            toast.error('Invalid email format', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error('Invalid email format');
             return;
         }
 
         if (password.length === 0) {
-            toast.error('Password cannot be empty', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error('Password cannot be empty');
             return;
         }
 
         try {
             const response = await fetch(`http://localhost:8000/users?email=${email}`);
-            const users = await response.json();
+            const users: IUser[] = await response.json();
 
             if (users.length > 0) {
                 const user = users[0];
-                const isPasswordValid = await bcrypt.compare(password, user.password);
-
+                // const isPasswordValid = await bcrypt.compare(password, user.password);
+                const isPasswordValid = password === user.password;
                 if (isPasswordValid) {
-                    toast.success('Login successful!', {
-                        position: "top-right",
-                        autoClose: 3000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
+                    toast.success('Login successful!');
 
                     localStorage.setItem('user', JSON.stringify(user));
-                    setTimeout(() => {
-                        router.push('/');
-                    }, 3000);
+                    // setTimeout(() => {
+                    //     router.push('/');
+                    // }, 3000);
+                    window.dispatchEvent(new Event('userLoggedIn'));
+                    setUser(user);
+                    router.push('/');
                 } else {
-                    toast.error('Invalid email or password', {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
+                    toast.error('Invalid email or password');
                 }
             } else {
-                toast.error('Invalid email or password', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                toast.error('Invalid email or password');
             }
         } catch (_error) {
             console.error('Error during login:', _error);
-            toast.error('An error occurred while logging in', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error('An error occurred while logging in');
         }
     };
 

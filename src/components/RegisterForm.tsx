@@ -7,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styles from '@/styles/register.module.css';
 import { useRouter } from 'next/navigation';
-import bcrypt from 'bcryptjs';
+// import bcrypt from 'bcryptjs';
 
 const RegisterForm = () => {
     const [email, setEmail] = useState('');
@@ -31,7 +31,7 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // const hashedPassword = await bcrypt.hash(password, 10);
 
         if (!validateEmail(email)) {
             toast.error('Invalid email format', {
@@ -89,32 +89,15 @@ const RegisterForm = () => {
             const checkResponse = await fetch(`http://localhost:8000/users?email=${email}`);
             const existingUsers = await checkResponse.json();
             if (existingUsers.length > 0) {
-                toast.error('Email already in use', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                toast.error('Email already in use');
                 return;
             }
         } catch (_error) {
             console.error(_error);
-            toast.error('Error checking email', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error('Error checking email');
             return;
         }
 
-        // Gửi yêu cầu đăng ký
         try {
             const response = await fetch('http://localhost:8000/users', {
                 method: 'POST',
@@ -124,7 +107,7 @@ const RegisterForm = () => {
                 body: JSON.stringify({
                     name: username,
                     email: email,
-                    password: hashedPassword,
+                    password: password,
                     role: 'USER',
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
@@ -142,7 +125,6 @@ const RegisterForm = () => {
                     progress: undefined,
                 });
 
-                // Reset form fields
                 setEmail('');
                 setUsername('');
                 setPassword('');
@@ -151,27 +133,11 @@ const RegisterForm = () => {
                 router.push('/auth/login');
             } else {
                 const errorData = await response.json();
-                toast.error(errorData.message || 'Registration failed', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                toast.error(errorData.message || 'Registration failed');
             }
         } catch (_error) {
             console.error(_error);
-            toast.error('An error occurred while registering', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error('An error occurred while registering');
         }
     };
 

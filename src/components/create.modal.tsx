@@ -1,3 +1,5 @@
+'use client';
+
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -5,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { mutate } from "swr";
 import '@/styles/create_modal.module.css';
+
 
 
 interface Iprops {
@@ -16,7 +19,6 @@ interface Iprops {
 function CreateModal(props: Iprops) {
     const { showModalCreate, setShowModalCreate, selectedUser } = props;
 
-    // State for form
     const [email, setEmail] = useState<string>("");
     const [name, setName] = useState<string>("");
     const [role, setRole] = useState<string>("");
@@ -28,70 +30,82 @@ function CreateModal(props: Iprops) {
             setEmail(selectedUser.email);
             setName(selectedUser.name);
             setRole(selectedUser.role);
-            setPassword(""); // Clear password and confirm password fields when editing
+            setPassword("");
             setConfirmPassword("");
         } else {
             setEmail("");
             setName("");
             setRole("");
-            setPassword(""); // Clear fields for new user
+            setPassword("");
             setConfirmPassword("");
         }
     }, [showModalCreate, selectedUser]);
 
-    const handleSubmitForm = () => {
+    const handleSubmitForm = async () => {
         if (!email) {
-            toast.error("Email is not empty!");
+            toast.error("Email cannot be empty!");
             return;
         }
         if (!name) {
-            toast.error("Name is not empty!");
+            toast.error("Name cannot be empty!");
             return;
         }
         if (!role) {
-            toast.error("Role is not empty!");
+            toast.error("Role cannot be empty!");
             return;
         }
         if (!selectedUser && !password) {
-            toast.error("Password is not empty!");
+            toast.error("Password cannot be empty!");
             return;
         }
-        if (password !== confirmPassword) {
+        if (!selectedUser && password !== confirmPassword) {
             toast.error("Passwords do not match!");
             return;
         }
 
-        // Determine the method and URL based on whether we are editing or creating
         const method = selectedUser ? 'PUT' : 'POST';
         const url = selectedUser
             ? `http://localhost:8000/users/${selectedUser.id}`
             : 'http://localhost:8000/users';
 
-        fetch(url, {
-            method: method,
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, email, role, ...(selectedUser ? {} : { password }) })
-        }).then(res => res.json())
-            .then(res => {
-                if (res) {
-                    toast.success(selectedUser ? "Update user succeed" : "Create new user succeed");
-                    handleCloseModal();
-                    mutate("http://localhost:8000/users");
-                } else {
-                    toast.error(selectedUser ? "Update error user" : "Create error new user");
-                }
+        const userData: Partial<IUser> = {
+            name,
+            email,
+            role,
+            ...(selectedUser ? {} : { password }) // password only when creating new user with admin
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
             });
+
+            const res = await response.json();
+
+            if (res) {
+                toast.success(selectedUser ? "Update user succeeded" : "Create new user succeeded");
+                handleCloseModal();
+                mutate("http://localhost:8000/users");
+            } else {
+                toast.error(selectedUser ? "Update error user" : "Create error new user");
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            toast.error("An error occurred while saving the user");
+        }
     }
 
     const handleCloseModal = () => {
         setName("");
         setEmail("");
         setRole("");
-        setPassword(""); // Reset password field
-        setConfirmPassword(""); // Reset confirm password field
+        setPassword("");
+        setConfirmPassword("");
         setShowModalCreate(false);
     }
 
@@ -105,14 +119,14 @@ function CreateModal(props: Iprops) {
                 size='lg'
             >
                 <Modal.Header closeButton>
-                    <Modal.Title>{selectedUser ? "Edit user" : "Add new user"}</Modal.Title>
+                    <Modal.Title>{selectedUser ? "Edit User" : "Add New User"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="email"
                                 placeholder="Enter email"
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
@@ -132,12 +146,14 @@ function CreateModal(props: Iprops) {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Role</Form.Label>
-                            <Form.Control
-                                placeholder="Enter role"
+                            <Form.Select
                                 value={role}
                                 onChange={(event) => setRole(event.target.value)}
                                 className="inputField"
-                            />
+                            >
+                                <option value="ADMIN">ADMIN</option>
+                                <option value="USER">USER</option>
+                            </Form.Select>
                         </Form.Group>
                         {!selectedUser && (
                             <>

@@ -1,4 +1,4 @@
-// src/app/users/page.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import AppTable from '@/components/app.table';
 import useSWR from 'swr';
@@ -28,5 +28,4 @@ const UsersPage = () => {
     );
 };
 
-// Bảo vệ trang chỉ cho phép người dùng có vai trò 'admin' truy cập
 export default withAuth(UsersPage, ['ADMIN']);
